@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sighedquest.in - Terminal Brainrot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff41;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.2;
+            overflow-x: auto;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .terminal-header {
+            background: #2d2d2d;
+            border: 2px solid #555;
+            border-radius: 8px 8px 0 0;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2);
+        }
+        
+        .terminal-buttons {
+            display: flex;
+            gap: 8px;
+            margin-right: 15px;
+        }
+        
+        .btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .btn-close { background: #ff5f57; }
+        .btn-minimize { background: #ffbd2e; }
+        .btn-maximize { background: #28ca42; }
+        
+        .terminal-title {
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .terminal-window {
+            background: #000;
+            border: 2px solid #555;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 65, 0.03) 2px,
+                    rgba(0, 255, 65, 0.03) 4px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .terminal-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .prompt {
+            color: #00ff41;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .prompt::before {
+            content: 'user@sighedquest:~$ ';
+            color: #00ff41;
+            font-weight: bold;
+        }
+        
+        .ascii-art {
+            white-space: pre;
+            color: #00ff41;
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+            font-size: 10px;
+            line-height: 1.1;
+            margin: 20px 0;
+            animation: glitch 3s infinite;
+        }
+        
+        .ascii-scene {
+            position: relative;
+            margin: 40px 0;
+        }
+        
+        .left-side {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        
+        .right-side {
+            position: absolute;
+            right: 0;
+            top: 50px;
+        }
+        
+        .center-trees {
+            text-align: center;
+            margin: 0 auto;
+            width: fit-content;
+        }
+        
+        .spaceship {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .scroll-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .scroll-text {
+            color: #666;
+            font-size: 14px;
+            animation: blink 2s infinite;
+        }
+        
+        .bottom-creatures {
+            margin-top: 100px;
+            text-align: center;
+        }
+        
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translateX(0); }
+            92% { transform: translateX(-2px); }
+            94% { transform: translateX(2px); }
+            96% { transform: translateX(-1px); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateX(-50%) translateY(0px); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .dragon { color: #ff4444; }
+        .knight { color: #4488ff; }
+        .bugs { color: #ffaa44; }
+        .trees { color: #44ff44; }
+        .spaceship-art { color: #cccccc; }
+        .zebra { color: #ffffff; }
+        .wolverine { color: #ff8844; }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body { font-size: 8px; padding: 10px; }
+            .ascii-art { font-size: 6px; }
+            .terminal-header { padding: 8px; }
+            .terminal-window { padding: 15px; }
+        }
+        
+        /* Cyberpunk glow effects */
+        .glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px rgba(0, 255, 65, 0.3); }
+            to { text-shadow: 0 0 20px rgba(0, 255, 65, 0.8), 0 0 30px rgba(0, 255, 65, 0.6); }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-header">
+        <div class="terminal-buttons">
+            <div class="btn btn-close"></div>
+            <div class="btn btn-minimize"></div>
+            <div class="btn btn-maximize"></div>
+        </div>
+        <div class="terminal-title">sighedquest@terminal: ~/brainrot_zone</div>
+    </div>
+    
+    <div class="terminal-window">
+        <div class="terminal-content">
+            <div class="prompt">cat welcome.txt</div>
+            
+            <div class="ascii-art glow">Welcome to the ULTIMATE BRAINROT ZONE! 🧠🔥
+Loading ASCII battlefield...</div>
+            
+            <div class="prompt">ls -la battlefield/</div>
+            
+            <div class="ascii-scene">
+                <!-- Spaceship floating above -->
+                <div class="spaceship">
+                    <div class="ascii-art spaceship-art">                    oooooOOOOOOOOOOOOOOOOooooo
+                  AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                 IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+                HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+               zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+    .<><><><><><><><><><><><><><><><><><><><><><><><><><><><>.
+  /XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\
+/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\
+\XXX[  ]XXX[  ]XXXX[  ]XXXX[  ]XXXX[  ]XXXX[  ]XXXX[  ]XXX[  ]XXX/
+  \XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/
+      ~~~~\XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/~~~~
+               /   ~~~<><><><><><><><><><>~~~   \
+              /      /       |   |          \      \
+             /     /               |          \     \
+            /    /           |                  \    \
+           /   /               |   |              \   \
+          /  /               |                      \  \
+        _/_/                     | |                  \_\_
+       <___>                 |    |                   <___>
+                                    |
+                              |</div>
+                </div>
+                
+                <!-- Left side: Bugs Bunny and Knight -->
+                <div class="left-side">
+                    <div class="ascii-art bugs">                          , ,
+                         /| |\
+                        / | | \
+                        | | | |     Neeaah, Whats up Doc !?!
+                        \ | | /
+                         \|w|/    /
+                         /_ _\   /      ,
+              /\       _:()_():_       /]
+              ||_     : ._=Y=_  :     / /
+             [)(_\,   ',__\W/ _,'    /  \
+             [) \_/\    _/'='\      /-/\)
+              [_| \ \  ///  \ '._  / /
+              :;   \ \///   / |  '` /
+              ;::   \ `|:   : |',_.'
+              """    \_|:   : |
+                       |:   : |'".
+                       /`._.'  \/
+                      /  /|   /
+                     |  \ /  /
+                      '. '. /
+                        '. '
+                        / \ \
+                       / / \'=,
+                 .----' /   \ (\__
+            snd (((____/     \ \  )
+                              '.\_)</div>
+                    
+                    <div class="ascii-art knight" style="margin-top: 50px;">              .
+             /.\
+             |.|
+             |.|
+             |.|
+             |.|   ,'`.
+             |.| ;\  /:
+             |.| /  \/  \
+             |.|<.<_\/_>,>
+             |.| \`.::,'/
+             |.|,'.'||'/.
+          ,-'|.|.`.____,'`.
+        ,' .`|.| `.____,;/ \
+       ,'=-.`|.|\ .   \ |,':
+      /_   :)|.|.`.___:,:,'|.
+     (  `-:;\|.|.`.)  |.`-':,\
+     /.   /  ;.:--'   |    | ,`.
+    / _>-'._.'-'.     |.   |' / )._
+   :.'    ((.__;/     |    |._ /__ `.___
+   `.>._.-' |)=(      |.   ;  '--.._,`-.`.
+            ',--'`-._ | _,:          `='`'
+            /_`-. `..`:'/_.\
+           :__``--..\\_/_..:
+           |  ``--..,:;\__.|
+           |`--..__/:;  :__|
+           `._____:-;_,':__;
+            |:'    /::'  `|
+            |,---.:  :,-'`;
+            : __  )  ;__,'\
+            \' ,`/   \__  :
+            :. |,:   :  `./
+            | `| |   |   |:
+            |  | |   |   ||
+            |  | |   |   ||
+            |  | |   '   ||
+            |  : |    \  ||
+            |  ; :    :  ||
+            | / ,;    |\,'`.
+            ;-.(,'    '-._,-`.
+          ,'-.//          `--' 
+          `---'</div>
+                </div>
+                
+                <!-- Center: Trees -->
+                <div class="center-trees">
+                    <div class="ascii-art trees">              v .   ._, |_  .,
+           `-._\/  .  \ /    |/_
+               \\  _\, y | \//
+         _\_.___\\, \\/ -.\||
+           `7-,--.`._||  / / ,
+           /'     `-. `./ / |/_.'
+                     |    |//
+                     |_    /
+                     |-   |
+                     |   =|
+                     |    |
+--------------------/ ,  . \--------</div>
+                    
+                    <div class="ascii-art trees" style="margin-left: 200px;">            .        +          .      .          .
+     .            _        .                    .
+  ,              /;-._,-.____        ,-----.__
+ ((        .    (_:#::_.:::. `-._   /:, /-._, `._,
+  `                 \   _|`"=:_::.`.);  \ __/ /
+                      ,    `./  \:. `.   )==-'  .
+    .      ., ,-=-.  ,\, +#./`   \:.  / /           .
+.           \/:/`-' , ,\ '` ` `   ): , /_  -o
+       .    /:+- - + +- : :- + + -:'  /(o-) \)     .
+  .      ,=':  \    ` `/` ' , , ,:' `'--".--"---._/`7
+   `.   (    \: \,-._` ` + '\, ,"   _,--._,---":.__/
+              \:  `  X` _| _,\/'   .-'
+.               ":._:`\____  /:'  /      .           .
+                    \::.  :\/:'  /              +
+   .                 `.:.  /:'  }      .
+           .           ):_(:;   \           .
+                      /:. _/ ,  |
+                   . (|::.     ,`                  .
+     .                |::.    {\
+                      |::.\  \ `.
+                      |:::(\    |
+              O       |:::/{ }  |                  (o
+               )  ___/#\::`/ (O "==._____   O, (O  /`
+          ~~~w/w~"~~,\` `:/,-(~`"~~~~~~~~"~o~\~/~w|/~
+      ~~~~~~~~~~~~~~~~~~~~~~~\\W~~~~~~~~~~~~\|/~~</div>
+                    
+                    <div class="ascii-art trees" style="margin-left: -100px;">                                                         .
+                                              .         ;  
+                 .              .              ;%     ;;   
+                   ,           ,                :;%  %;   
+                    :         ;                   :;%;'     .,   
+           ,.        %;     %;            ;        %;'    ,;
+             ;       ;%;  %%;        ,     %;    ;%;    ,%'
+              %;       %;%;      ,  ;       %;  ;%;   ,%;' 
+               ;%;      %;        ;%;        % ;%;  ,%;'
+                `%;.     ;%;     %;'         `;%%;.%;'
+                 `:;%.    ;%%. %@;        %; ;@%;%'
+                    `:%;.  :;bd%;          %;@%;'
+                      `@%:.  :;%.         ;@@%;'   
+                        `@%.  `;@%.      ;@@%;         
+                          `@%%. `@%%    ;@@%;        
+                            ;@%. :@%%  %@@%;       
+                              %@bd%%%bd%%:;     
+                                #@%%%%%:;;
+                                %@@%%%::;
+                                %@@@%(o);  . '         
+                                %@@@o%;:(.,'         
+                            `.. %@@@o%::;         
+                               `)@@@o%::;         
+                                %@@(o)::;        
+                               .%@@@@%::;         
+                               ;%@@@@%::;.          
+                              ;%@@@@%%:;;;. 
+                          ...;%@@@@@%%:;;;;,..</div>
+                </div>
+                
+                <!-- Right side: Dragon -->
+                <div class="right-side">
+                    <div class="ascii-art dragon">                                 _
+                              ==(W{==========-      /===-
+                                ||  (.--.)         /===-_---~~~~~~~----__
+                                | \_,|**|,__      |===-~___            _,-'`
+                   -==\\        `\ ' `--'   ),    `//~\\   ~~~~`--._.-~
+               ______-==|        /`\_. .__/\ \    | |  \\          _-~`
+         __--~~~  ,-/-==\\      (   | .  |~~~~|   | |   `\       ,'
+      _-~       /'    |  \\     )__/==0==-\<>/   / /      \     /
+    .'        /       |   \\      /~\___/~~\/  /' /        \   /
+   /  ____  /         |    \`\.__/-~~   \  |_/'  /          \/'
+  /-'~    ~~~~~---__  |     ~-/~         ( )   /'        _--~`
+                    \_|      /        _) | ;  ),   __--~~
+                      '~~--_/      _-~/- |/ \   '-~ \
+                     {\__--_/}    / \\_>-|)<__\      \
+                     /'   (_/  _-~  | |__>--<__|      |
+                    |   _/) )-~     | |__>--<__|      |
+                    / /~ ,_/       / /__>---<__/      |
+                   o-o _//        /-~_>---<__-~      /
+                   (^(~          /~_>---<__-      _-~
+                  ,/|           /__>--<__/     _-~
+               ,//('(          |__>--<__|     /                  .--_
+              ( ( '))          |__>--<__|    |                 /' _-_~\
+           `-)) )) (           |__>--<__|    |               /'  /   ~\`\
+          ,/,'//( (             \__>--<__\    \            /'  //      ||
+        ,( ( ((, ))              ~-__>--<_~-_  ~--__---~'/'/  /'       VV
+      `~/  )` ) ,/|                 ~-_~>--<_/-__      __-~ _/
+    ._-~//( )/ )) `                    ~~-'_/_/ /~~~~~__--~
+     ;'( ')/ ,)(                              ~~~~~~~~
+    ' ') '( (/</div>
+                </div>
+            </div>
+            
+            <div class="prompt" style="margin-top: 300px;">echo "Epic battle commenced..."</div>
+            
+            <!-- First scroll section -->
+            <div class="scroll-section">
+                <div class="scroll-text">[ Scrolling through the matrix... ]</div>
+                <div class="ascii-art" style="color: #333; font-size: 8px;">
+.....................................................................
+.....................................................................
+.....................................................................
+                </div>
+            </div>
+            
+            <!-- Second scroll section -->
+            <div class="scroll-section">
+                <div class="scroll-text">[ Loading hidden creatures... ]</div>
+                <div class="ascii-art" style="color: #333; font-size: 8px;">
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                </div>
+            </div>
+            
+            <div class="prompt">cat /dev/wilderness/*</div>
+            
+            <!-- Bottom creatures section -->
+            <div class="bottom-creatures">
+                <div class="ascii-art zebra">                           ,, ,,, ,,,, ,,,,,,,,
+              /\        /;; ;;;;;;;;;;;;;; ;;;/ ,;`.   ,,,,
+             ;  `-.    /// //////// /////  // ,','`;. ///;;;;,.
+            ,'   ,,`-.;;;;;; ;;;;;;; ;;;;// ,' ,'  `.`. ///;;//;,
+           ,'   ;;;//////// ////// ///////,'  ,'     ; : ;;// ;//,
+           `.  ;`;;;;;;;: ;;;;:;; ;:;:;;:;:  ,'     ,' : ;;;;;;;;/,
+            `. `; :!::::!;;;;;!::::!;!;;!;:  `.   ,'  ,'///!!;;;;;;
+              `._!!;!!!!;!!!!!;!!!!;!;!!;!!`.  `;'  ,'-.!!!//;;;////
+                 ;   .   .               ,        ,'    ::-!_///;;;;
+               .' ,%'  ,%'     `%.   `%.;;   `%.   ;;   ,::  `! ////
+              .', '    '    `%,  `:.   `::.   ::  :;    %::    `! ;;
+             ,';;        `%, `;;.         `::. `.;;;    `:%   %:///
+            ,';;'  ;      ;;  `::;   `%,    ;%:.  ::     ::     %`!/
+          ,' ;.'  .%.    ;;    `;;     ;;   ' `;   %     ::    %  :
+          :  `;;  %%%    `::   ;;     ;;;      `    `    ::     % `
+          ;    ' .%%'  `%  ;   '  ,., `;;         `%,   ::'   %::%
+         ;`. `.  %%%%   ;;   .___;;;;  '     `:    `;   ::     :::
+         : :  ;  %%%%   ;: ,:' _ `.`.        ;;;   ;;   `::    :::.
+         `.;  ;  `%%'  ;;' :: (0) ; :       ::'    ;      ::   `:::
+          ,' ;'  %%'  ;;'  ;;.___,',;       ;;    ;;       ;   ,:::
+         ,  ;'  :%:   ;;  ,'------''      ;;;'  .;;            :::'
+        ,' ;;   ;%;   ;;  '             ::'    ,;;;            :::
+        :  :'   :%:   `;             ;;;;'      ;;             ::%
+        :  ;;   :%'   ;;   ;...,,;;''         ;;'    ;     ;   :::
+        ;  `;   ::   ;;' ,:::'     .        .;;     ,'    ;;   `;;
+        ;  ;'   :: .;;' ,:::'   ,::%.      ;;;    ,'     ;;    ,;;
+        : ;;.  .:' ;;' ,:::' ;;:::' ;;    ;;'    ,'    ;;;    ;;;'
+         :`;;  ::  ;;  ;;;' '  .    ;;    '  _,-'     ;;;     `;'
+         : ;' .:'  ;; .::: ,%'`;   ;;;   _,-'       .;;;'     ;'
+        ,' ;; ;;  ;;' :::' ,, .;  ;;  _,' ;      ,;;;'     ,;;'
+       .'~~~~~~~~~._ ,;' ,',' ;;  ',-'   ,'    ,';;       ;;;'   ;;;
+     ,'             `-.,' .'  ;; ,'     ,' ;;;;;;'       ,;;    ;;;
+    .';           .    `.,   ;; ,'      ;              ,;;%    ;;;
+    : ..       _.';     ;   '_,'       .'       ,,,,,,,%;;'    `;;;
+    `.  .     (_.' .  ;'  ,-'          :  ,,,,,;;;;;;;;;'      .;;;
+      `-._        ___,' ,'             :.."""""`````'        ,;;;;
+          `------'____.'               :                   ..;;;;
+             `---'                     `.               ..;;;;'
+                                        :......:::::::::;;;;'
+                                         :::::::::::::::;'      ,;;;
+                                          ;                   ;;;;'
+                                          ;                 .;;;;
+                                        ,'...:::::.        ;;;'
+                                       .'          `;;;;;;''
+                                       ;
+                                       `----------------------------</div>
+                
+                <div class="ascii-art wolverine" style="margin-top: 50px;">                 :
+                  :
+                  ::
+                  :::
+                  ::::
+                 .::::.
+                 ::::::.
+                :::::::::
+               :::::::::::                                           .
+              :::::::::::::                                         ::
+             :::::::::::::::                                      .::
+           :::::::::::::::::                                    .:::
+          ::::::::::::::::::                                  .:::::
+         :::::::::::::::''''                                .::::::
+        :::::::::::',,cd$$$$$$$$$$hcc,.                  .:::::::::
+      :::::::'`.,cc$$$$$$$$$$$$$$$$$$$$$$c,.         ..:::::::::::'
+     :::::: ,c$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$h   ..::::::::::::::::
+    ::::: ,$$P"',$$P""$$$$$$$$$$$$$$$$$$PF""..::::::::::::::::::::
+    ::: ,$$",c$$$",d$$$$$$$$$$$$$$$P"".::::::::::::::::::::::::::
+   ::: J$$$$$$$$$$$$$$$$$$$$$$P"'.:::::::::::::::::::::::::::::::
+  ::: $$$$$$$$$$$$$$$$$$$$P".::::::::::::::::::::::::::::::::::::
+  :: J$$$$$$$$$$$$$$$$$$P':::::::::::::::::::::::::::::::::::::::
+  :: ?$$$$$$$$$$$$$$$P".:::::::::::::::::::::::::::::::::::::::::
+ .::: $$$$$$$$$$$$$".::::::::::::::::::::::::::::::::::::::::::::
+ `::::`?$$$$"3$$$$':::::::::::::::::::::::::::::::::::::::::::::
+  ::::: ?$$F,$$$$':::::::::::::::::::::::::::::::::::`:::::::::'
+  :::::: "P $F3$'::::::::::::::::::::::::::::::::::`. '`:: `::::::'
+ ```:::::: <$ $$ ::::::::````:::::::::::::::::` :: : :: :::::
+    =cc,`:  " "" :::'`,cc$$$ `::::::::::::::::::`:`  :::::::
+    :.`"" d$$$$$ ::  `???"".::::::::::::::::::::` : :: ::'`
+   ::::: d$$$$F :::::::::::::::::::::::::::::::::: :: ',,cc,
+   ::::'J$$$$$> ::::::::::::::::::::::::::::::::::'`,c$$$$$$$h,
+   `::: $$$$P'::::::::::::::::::::::::::::::::::::<$$$$$$$$$$$$$,?$$$ccccc,.
+      ` $$$P :::::::::``````::::::::::::::::::::::<$$$$$$$$$$$$$$cJ$$$$$$$$$
+     '$ ??" `.,,cccccc$$$$$$ccc,``::::::::::::::: J$$$$$$$$$$$$$$$$$$$$$$$$$
+      $$hh$$$$$$$$$$h,"?$$$$$$$$`.`::::::::::::: c$$$$$$$$$$$$$$$$$$$$$$$$$$
+      ?$??$$?????$$$$$$$c.`"$$$$$ ::::::::::::: ,$$$$$$$$$$$$$$$$$$$$$$$$$$$
+       $$ec :;;;;;;;, "$$$$c $$$$ :::::::::::: J$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+       $$$$,,`'''`,,ccc$$$$$,"$$$> :::::::``  $$$$$$$$$$$$$$$$$$$$$$$$$$$$P"
+       4$",$$$$$$$$$$$$$$$$$$c$$$':::``,ccc$  $$$$$$$$$$$$$$$$$$$$$$$$$$$".:
+       4$$cccc,,$$$$$$$$$$$$$$??".,,c$$$$$$$  $$$$$$$$$$$$$$$$$$F,z$$$$" :::
+     :: "$$$$$$$$$$$$$$$$P",, d")C3$$$$$$$$$> $$$$$$$$$$$$$$$P",c$$$$$" ::::
+    ::::."???$$$$$$$$$P".." "L'$ccc?$$$$$$$$$ ?$$$$$$$$$$$$$P z$$$$$$F :::::
+    :::::::::::.."""".::',c  `ccc==-3$$$$$$$$h`$$$$$$$$$$$$",,$$$$$$$ ::::::
+    :::::::::::::::::::',$F': .`??",`?$$$$$$$$c$$$$$$$$$$$F, d$$$$$$F ::::::
+     :::::::::::::::::: $$F::::`?cc,"?$$$$$$$$$$$$$$$$$$$$,L$$$$$$$$ ::::```
+      ::::::::::::::::'J$$':::: zc,"=-""?$$$$$$$$$$$$$$$$$$$$$$$PF" .::::::
+       `:::::::::::::: $$$ ::::<$$$$$$cc,,,J$$$$$$$$$$$$$$$$$P",c$" :::::: d
+        `::::::::::::: $$$,:::'<$$$$$$$$$$$$$$$$$$$$$$$$P",zd$$$$$ :````` ??
+         `:::::::::::: $$$L`:: $$$$$$$$$$$$$??$$$$$$??$$$$$$$$$P"".:::: z$$$
+           ::::::::::: $$$$ :: $$$$$$$$$$$$$bc,"??",cd$$$$$$$$$d$ :::::<$$$$
+            `::::::::: ?$$$c`: $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$h`::: $$$$$
+             ,`:::::::.`$$$$,` $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ :::,$$$$$
+             $$c,`::::: ?$$$$, 3$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$c`: $$$$$$
+             $$$$bc``::: $$$$$cd$$$$$$$$$$$$$$$ d$$$$$$$$$$$$$$$$$$ : $$$$$$
+              $$$$$$c,`::`$$$$$$$$$$$$$$$$$$$$ d$$$$$$$$$$$$$$$$$$$h` $$$$$$</div>
+            </div>
+            
+            <div class="prompt" style="margin-top: 50px;">echo "BRAINROT LEVEL: MAXIMUM ACHIEVED! 🔥💀⚡"</div>
+            <div class="ascii-art glow" style="text-align: center; margin-top: 30px;">
