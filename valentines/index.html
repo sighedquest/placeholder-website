@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #ffe5f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .window {
+            background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-width: 550px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .title-bar {
+            background: linear-gradient(180deg, #ffb3d9 0%, #ff8fc7 100%);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ff7ab8;
+        }
+
+        .title-text {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .window-icon {
+            font-size: 16px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .control-btn {
+            width: 24px;
+            height: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 2px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
+            font-size: 11px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%);
+        }
+
+        .content {
+            padding: 30px 20px;
+            text-align: center;
+            background: white;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #ff69b4;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .bear-gif {
+            width: 200px;
+            height: 200px;
+            margin: 10px auto 20px;
+            display: block;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: nowrap;
+            align-items: center;
+            min-height: 60px;
+        }
+
+        button {
+            padding: 10px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            min-width: 100px;
+            margin: 0 15px;
+        }
+
+        .yes-btn {
+            background: linear-gradient(180deg, #ffb3d9 0%, #ff8fc7 100%);
+            border-color: #ff7ab8;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .yes-btn:hover {
+            background: linear-gradient(180deg, #ffc4e1 0%, #ffa0d2 100%);
+            box-shadow: 0 3px 6px rgba(255, 105, 180, 0.4);
+        }
+
+        .yes-btn:active {
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .no-btn {
+            background: linear-gradient(180deg, #f0f0f0 0%, #d8d8d8 100%);
+            border-color: #b8b8b8;
+            color: #555;
+        }
+
+        .no-btn:hover {
+            background: linear-gradient(180deg, #f8f8f8 0%, #e0e0e0 100%);
+        }
+
+        .no-btn:active {
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .gif-box {
+            margin: 25px auto;
+            border: 3px solid #ffb3d9;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: fit-content;
+        }
+
+        .gif-box img {
+            width: 100%;
+            max-width: 350px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .status-bar {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            padding: 6px 12px;
+            border-top: 1px solid #ccc;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 24px; }
+            button { padding: 10px 25px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="window">
+        <div class="title-bar">
+            <div class="title-text">
+                <span class="window-icon">♥</span>
+                <span>Valentine's Day Message</span>
+            </div>
+            <div class="window-controls">
+                <div class="control-btn">_</div>
+                <div class="control-btn">□</div>
+                <div class="control-btn">×</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="page active" id="questionPage">
+                <h1>Will You Be My Valentine Sweksha Darling?</h1>
+                <img src="https://gifdb.com/images/high/cute-love-bear-roses-ou7zho5oosxnpo6k.gif" alt="Cute bear with roses" class="bear-gif">
+                
+                <div class="button-container">
+                    <button class="yes-btn" id="yesBtn">Yes</button>
+                    <button class="no-btn" id="noBtn">No</button>
+                </div>
+            </div>
+
+            <div class="page" id="successPage">
+                <h1>Yayyy! I love you sooooooo muchh!</h1>
+                <div class="gif-box">
+                    <img src="https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif" alt="Bear kisses celebration">
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            Made with ♥ by Your Baka
+        </div>
+    </div>
+
+    <script>
+        const questionPage = document.getElementById('questionPage');
+        const successPage = document.getElementById('successPage');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+
+        let attempts = 0;
+        let yesBtnSize = 1;
+
+        const noButtonTexts = [
+            "No",
+            "are you sure?",
+            "what if I asked really nicely?",
+            "pretty please?",
+            "with a chocolate crackle cake on top?",
+            "what about a batasha date?",
+            "red sauce pasta and coolers?",
+            "pwease pookie?",
+            "but :*(",
+            "i am going to die",
+            "yep i am ded",
+            "ok u r talking to sai's ghost",
+            "please babe",
+            ":((((", 
+            "PRETTY PLEASE",
+            "estoy muerto",
+            "no puedo vivir sin ti"
+        ];
+
+        yesBtn.addEventListener('click', () => {
+            questionPage.classList.remove('active');
+            successPage.classList.add('active');
+        });
+
+        noBtn.addEventListener('click', (e) => {
+            attempts++;
+            
+            if (attempts < noButtonTexts.length) {
+                noBtn.textContent = noButtonTexts[attempts];
+            } else {
+                noBtn.textContent = "No :(";
+            }
+            
+            yesBtnSize += 0.05;
+            yesBtn.style.transform = `scale(${yesBtnSize})`;
+            
+            if (attempts >= 17) {
+                e.preventDefault();
+                runAway();
+            }
+        });
+
+        function runAway() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+            
+            const maxX = windowWidth - btnWidth - 20;
+            const maxY = windowHeight - btnHeight - 20;
+            
+            const randomX = Math.max(20, Math.random() * maxX);
+            const randomY = Math.max(20, Math.random() * maxY);
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+            noBtn.style.transition = 'all 0.3s ease';
+        }
+
+        noBtn.addEventListener('mouseenter', () => {
+            if (attempts >= 17) {
+                runAway();
+            }
+        });
+
+        noBtn.addEventListener('touchstart', (e) => {
+            if (attempts >= 17) {
+                e.preventDefault();
+                runAway();
+            }
+        });
+    </script>
+</body>
+</html>
